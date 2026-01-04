@@ -68,7 +68,7 @@ pip install numpy pandas scikit-learn catboost torch pubchempy requests
 
 
 
-````markdown
+````
 ## Option B — Pip-only Installation
 
 If you cannot use **Conda**, you can install all required dependencies via `pip`:
