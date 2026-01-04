@@ -64,3 +64,172 @@ conda activate dipole_mu
 
 conda install -c conda-forge rdkit -y
 pip install numpy pandas scikit-learn catboost torch pubchempy requests
+
+
+
+
+````markdown
+## Option B — Pip-only Installation
+
+If you cannot use **Conda**, you can install all required dependencies via `pip`:
+
+```bash
+pip install numpy pandas scikit-learn catboost torch pubchempy requests rdkit-pypi
+````
+
+> **Note:** `rdkit-pypi` may be less robust than the `conda-forge` RDKit distribution on some operating systems. Conda is recommended when possible.
+
+---
+
+## 📊 Data Format (Input Schema)
+
+To run the pipeline on your own data, ensure that your input CSV files
+`train_ready.csv` and `test_ready.csv` follow the schema below:
+
+| Column Name     | Type   | Description                                     |
+| --------------- | ------ | ----------------------------------------------- |
+| `SMILES`        | String | Canonical SMILES representation of the molecule |
+| `dipole_moment` | Float  | Experimental dipole moment value (**target**)   |
+| `Name`          | String | *(Optional)* Common molecule name or identifier |
+
+---
+
+## 🚀 Quick Start (End-to-End Pipeline)
+
+### 1. *(Optional)* Convert Chemical Names to SMILES
+
+If your dataset contains only molecule names:
+
+```bash
+python 1_convert_smiles.py
+```
+
+---
+
+### 2. Generate 2D Fingerprint Features
+
+This step extracts **MACCS keys** and **Avalon fingerprints**:
+
+```bash
+python 2_rdkit_fingerprints_features.py
+```
+
+---
+
+### 3. Train the 2D CatBoost Model
+
+```bash
+python 3_catboost_train_and_save.py \
+  --train_csv train_ready.csv \
+  --test_csv test_ready.csv
+```
+
+---
+
+### 4. Train the Multi-view ANN Model
+
+```bash
+python 3_ann_multiview_train_and_save.py \
+  --train_csv train_ready.csv \
+  --test_csv test_ready.csv
+```
+
+---
+
+### 5. Train the Stabilized 3D GNN Model
+
+This step generates molecular conformers on-the-fly (or loads them from cache) and trains a geometry-aware graph neural network.
+
+**CPU execution:**
+
+```bash
+python 3_3d_gnn_train_and_save.py \
+  --train_csv train_ready.csv \
+  --test_csv test_ready.csv \
+  --device cpu
+```
+
+**GPU execution:**
+
+```bash
+python 3_3d_gnn_train_and_save.py \
+  --train_csv train_ready.csv \
+  --test_csv test_ready.csv \
+  --device cuda
+```
+
+---
+
+### 6. Hybrid Ensemble Fusion
+
+This step combines predictions from:
+
+* 2D CatBoost
+* Multi-view ANN
+* 3D GNN
+
+```bash
+python 4_Hybrid_3d_gnn+catboosting+multi_view_*.py
+```
+
+---
+
+## 📈 Outputs & Reproducibility
+
+Each training script generates the following artifacts to ensure full reproducibility of the manuscript results:
+
+### Generated Outputs
+
+* **Metrics:**
+  JSON and CSV summaries containing `R²`, `MAE`, and `RMSE` for each run
+
+* **Predictions:**
+  CSV files with `y_true` vs. `y_pred` for detailed error analysis
+
+* **Models:**
+  Trained model checkpoints saved under the `models/` directory
+
+---
+
+### Reproducing Manuscript Results
+
+* **2D baseline results:**
+  Use outputs from **Step 3** (CatBoost) and **Step 4** (Multi-view ANN)
+
+* **3D geometry-aware results:**
+  Use outputs from **Step 5** (3D GNN)
+
+* **Final hybrid performance (Table X in manuscript):**
+  Refer to the console output and log files generated in **Step 6**
+
+> **Note:** Deterministic random seeds are used where possible.
+> However, **3D conformer generation (ETKDG)** and **GPU-level non-determinism** may result in minor variations in decimal values.
+
+---
+
+## 📄 Citation
+
+If you use this repository or its methodology, please cite the associated manuscript:
+
+> **Noise-Ceiling-Aware Hybrid 2D+3D Learning for Experimental Dipole Moment Prediction**
+> *(Author list and journal information will be updated upon publication.)*
+
+---
+
+## ⚖️ License & Contact
+
+**License:**
+This code is provided for **academic use only**.
+
+**Commercial usage:**
+Please contact the author for licensing inquiries.
+
+**Contact:**
+**Sadettin Y. Ugurlu**
+📧 *[s.yavuz.ugurlu@gmail.com](mailto:s.yavuz.ugurlu@gmail.com)*
+
+```
+```
+
+
+
