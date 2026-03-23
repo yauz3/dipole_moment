@@ -1,0 +1,37 @@
+{
+  "train_csv": "train_ready.csv",
+  "test_csv": "test_ready.csv",
+  "target": "Dipole moment\u03bc debye",
+  "seed": 42,
+  "run_cv": false,
+  "cv_folds": null,
+  "models": {
+    "cb_fp": {
+      "description": "CatBoost \u2014 Fingerprint only",
+      "n_features": 2087,
+      "metrics": {
+        "R2": 0.7884191995990922,
+        "MAE": 0.5020107117709555,
+        "RMSE": 0.7537090742711458,
+        "n": 996
+      }
+    },
+    "cb_fp_svr": {
+      "description": "CatBoost \u2014 Fingerprint + SVR Features",
+      "n_features": 2280,
+      "n_fp": 2087,
+      "n_svr": 193,
+      "metrics": {
+        "R2": 0.8175546675508446,
+        "MAE": 0.4430699658373067,
+        "RMSE": 0.6998935556414335,
+        "n": 996
+      }
+    }
+  },
+  "saved_models_dir": "run_catboost/saved_models",
+  "svr_feature_cache": {
+    "train": "run_catboost/cache_svr_features/features_train_svr.csv",
+    "test": "run_catboost/cache_svr_features/features_test_svr.csv"
+  }
+}
